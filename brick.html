@@ -118,9 +118,7 @@
 					var prevBallY = ballY - ballSpeedY
 					var prevBrickCol = Math.floor(prevBallX / BRICK_W)
 					var prevBrickRow = Math.floor(prevBallY / BRICK_H)
-
 					var bothTestsFailed = true
-
 					if (prevBrickCol !== ballBrickCol) {
 						if (isBrickAtColRow(prevBrickCol, ballBrickRow) === false) {
 							bothTestsFailed = false
@@ -182,12 +180,7 @@
 			colorRect(0, 0, canvas.width, canvas.height, 'black') // Clear Screen
 			colorCircle(ballX, ballY, 10, 'white') // Draw Ball
 			colorRect(paddleX, canvas.height - PADDLE_DIST_FROM_EDGE, PADDLE_WIDTH, PADDLE_THICKNESS, 'white')
-
 			drawBricks()
-			// var mouseBrickCol = Math.floor(mouseX / BRICK_W)
-			// var mouseBrickRow = Math.floor(mouseY / BRICK_H)
-			// var brickIndexUnderMouse = rowColToArrayIndex(mouseBrickCol, mouseBrickRow)
-			// colorText(mouseBrickCol + ', ' + mouseBrickRow + ': ' + brickIndexUnderMouse, mouseX, mouseY, 'yellow')
 		}
 
 		function colorRect(topLeftX, topLeftY, boxWidth, boxHeight, fillColor) {
