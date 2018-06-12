@@ -21,19 +21,28 @@
 		var mouseX
 		var mouseY
 
-		const PADDLE_WIDTH = 100
-		const PADDLE_THICKNESS = 10
-		const PADDLE_DIST_FROM_EDGE = 60
-		const BRICK_W = 80
-		const BRICK_H = 20
-		const BRICK_COLS = 10
-		const BRICK_ROWS = 14
-		const BRICK_GAP = 2
+		const TRACK_W = 40
+		const TRACK_H = 40
+		const TRACK_COLS = 20
+		const TRACK_ROWS = 15
+		const TRACK_GAP = 2
 
-		var brickGrid = new Array(BRICK_COLS * BRICK_ROWS)
-		var bricksLeft = 0
+		var trackGrid = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+			1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1,
+			1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
+			1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1,
+			1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
+			1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+			1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+			1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+			1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+			1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-		var paddleX = 400
 
 		function updateMousePos(e) {
 			var rect = canvas.getBoundingClientRect()
@@ -41,8 +50,6 @@
 
 			mouseX = e.clientX - rect.left - root.scrollLeft
 			mouseY = e.clientY - rect.top - root.scrollTop
-
-			paddleX = mouseX - PADDLE_WIDTH / 2
 
 			// Test Cheat 
 			// ballX = mouseX
@@ -56,7 +63,6 @@
 			canvasContext = canvas.getContext('2d')
 
 			const framesPerSecond = 30
-			brickReset()
 			ballReset()
 			setInterval(updateAll, 1000 / framesPerSecond)
 
@@ -74,17 +80,6 @@
 			ballY = canvas.height / 2
 		}
 
-		function brickReset() {
-			bricksLeft = 0
-			let i
-			for (i = 0; i < 3 * BRICK_COLS; i++)
-				brickGrid[i] = false
-			for (; i < BRICK_COLS * BRICK_ROWS; i++) {
-				brickGrid[i] = true
-				bricksLeft++
-			}
-		}
-
 		function ballMove() {
 			ballX += ballSpeedX
 			ballY += ballSpeedY
@@ -93,42 +88,39 @@
 			if (ballY < 0 && ballSpeedY < 0.0) ballSpeedY *= - 1 // Top
 			if (ballY > canvas.height) {
 				ballReset()
-				brickReset()
 			} // Bottom
 		}
 
-		function isBrickAtColRow(col, row) {
-			if (col >= 0 && col < BRICK_COLS && row >= 0 && row < BRICK_ROWS) {
-				var brickIndexUnderCoord = rowColToArrayIndex(col, row)
-				return brickGrid[brickIndexUnderCoord]
+		function isTrackAtColRow(col, row) {
+			if (col >= 0 && col < TRACK_COLS && row >= 0 && row < TRACK_ROWS) {
+				var trackIndexUnderCoord = rowColToArrayIndex(col, row)
+				return (trackGrid[trackIndexUnderCoord] === 1)
 			} else return false
 		}
 
-		function ballBrickHandling() {
-			var ballBrickCol = Math.floor(ballX / BRICK_W)
-			var ballBrickRow = Math.floor(ballY / BRICK_H)
-			var brickIndexUnderBall = rowColToArrayIndex(ballBrickCol, ballBrickRow)
+		function ballTrackHandling() {
+			var ballTrackCol = Math.floor(ballX / TRACK_W)
+			var ballTrackRow = Math.floor(ballY / TRACK_H)
+			var trackIndexUnderBall = rowColToArrayIndex(ballTrackCol, ballTrackRow)
 
-			if (ballBrickCol >= 0 && ballBrickCol < BRICK_COLS &&
-				ballBrickRow >= 0 && ballBrickRow < BRICK_ROWS) {
-				if (isBrickAtColRow(ballBrickCol, ballBrickRow)) {
-					brickGrid[brickIndexUnderBall] = false
-					bricksLeft--
+			if (ballTrackCol >= 0 && ballTrackCol < TRACK_COLS &&
+				ballTrackRow >= 0 && ballTrackRow < TRACK_ROWS) {
+				if (isTrackAtColRow(ballTrackCol, ballTrackRow)) {
 					var prevBallX = ballX - ballSpeedX
 					var prevBallY = ballY - ballSpeedY
-					var prevBrickCol = Math.floor(prevBallX / BRICK_W)
-					var prevBrickRow = Math.floor(prevBallY / BRICK_H)
+					var prevTrackCol = Math.floor(prevBallX / TRACK_W)
+					var prevTrackRow = Math.floor(prevBallY / TRACK_H)
 
 					var bothTestsFailed = true
 
-					if (prevBrickCol !== ballBrickCol) {
-						if (isBrickAtColRow(prevBrickCol, ballBrickRow) === false) {
+					if (prevTrackCol !== ballTrackCol) {
+						if (isTrackAtColRow(prevTrackCol, ballTrackRow) === false) {
 							bothTestsFailed = false
 							ballSpeedX *= -1
 						}
 					}
-					if (prevBrickRow !== ballBrickRow) {
-						if (isBrickAtColRow(ballBrickCol, prevBrickRow) === false) {
+					if (prevTrackRow !== ballTrackRow) {
+						if (isTrackAtColRow(ballTrackCol, prevTrackRow) === false) {
 							bothTestsFailed = false
 							ballSpeedY *= -1
 						}
@@ -141,53 +133,33 @@
 			}
 		}
 
-		function ballPaddleHandling() {
-			var paddleTopEdgeY = canvas.height - PADDLE_DIST_FROM_EDGE
-			var paddleBottomEdgeY = paddleTopEdgeY + PADDLE_THICKNESS
-			var paddleLeftEdgeX = paddleX
-			var paddleRightEdgeX = paddleLeftEdgeX + PADDLE_WIDTH
-			if (ballY > paddleTopEdgeY &&
-				ballY < paddleBottomEdgeY &&
-				ballX > paddleLeftEdgeX &&
-				ballX < paddleRightEdgeX) {
-				ballSpeedY *= -1
-				var centerOfPaddleX = paddleX + PADDLE_WIDTH / 2
-				var ballDistFromPaddleCenterX = ballX - centerOfPaddleX
-				ballSpeedX = ballDistFromPaddleCenterX * 0.35
-				if (bricksLeft === 0)
-					brickReset()
-			}
-		}
-
 		function moveAll() {
 			ballMove()
-			ballBrickHandling()
-			ballPaddleHandling()
+			ballTrackHandling()
 		}
 
 		function rowColToArrayIndex(col, row) {
-			return col + BRICK_COLS * row
+			return col + TRACK_COLS * row
 		}
 
-		function drawBricks() {
-			for (let eachRow = 0; eachRow < BRICK_ROWS; eachRow++)
-				for (let eachCol = 0; eachCol < BRICK_COLS; eachCol++) {
+		function drawTracks() {
+			for (let eachRow = 0; eachRow < TRACK_ROWS; eachRow++)
+				for (let eachCol = 0; eachCol < TRACK_COLS; eachCol++) {
 					let arrayIndex = rowColToArrayIndex(eachCol, eachRow)
-					if (brickGrid[arrayIndex])
-						colorRect(BRICK_W * eachCol, BRICK_H * eachRow, BRICK_W - BRICK_GAP, BRICK_H - BRICK_GAP, 'blue')
+					if (trackGrid[arrayIndex] === 1)
+						colorRect(TRACK_W * eachCol, TRACK_H * eachRow, TRACK_W - TRACK_GAP, TRACK_H - TRACK_GAP, 'blue')
 				}
 		}
 
 		function drawAll() {
 			colorRect(0, 0, canvas.width, canvas.height, 'black') // Clear Screen
 			colorCircle(ballX, ballY, 10, 'white') // Draw Ball
-			colorRect(paddleX, canvas.height - PADDLE_DIST_FROM_EDGE, PADDLE_WIDTH, PADDLE_THICKNESS, 'white')
 
-			drawBricks()
-			// var mouseBrickCol = Math.floor(mouseX / BRICK_W)
-			// var mouseBrickRow = Math.floor(mouseY / BRICK_H)
-			// var brickIndexUnderMouse = rowColToArrayIndex(mouseBrickCol, mouseBrickRow)
-			// colorText(mouseBrickCol + ', ' + mouseBrickRow + ': ' + brickIndexUnderMouse, mouseX, mouseY, 'yellow')
+			drawTracks()
+			// var mouseTrackCol = Math.floor(mouseX / TRACK_W)
+			// var mouseTrackRow = Math.floor(mouseY / TRACK_H)
+			// var trackIndexUnderMouse = rowColToArrayIndex(mouseTrackCol, mouseTrackRow)
+			// colorText(mouseTrackCol + ', ' + mouseTrackRow + ': ' + trackIndexUnderMouse, mouseX, mouseY, 'yellow')
 		}
 
 		function colorRect(topLeftX, topLeftY, boxWidth, boxHeight, fillColor) {
