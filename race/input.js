@@ -1,11 +1,6 @@
 var mouseX = 0
 var mouseY = 0
 
-var keyHeld_Gas = false
-var keyHeld_Reverse = false
-var keyHeld_TurnLeft = false
-var keyHeld_TurnRight = false
-
 function setupInput() {
 	canvas.addEventListener('mousemove', updateMousePos)
 
@@ -27,18 +22,19 @@ function updateMousePos(e) {
 	// carSpeedY = -4
 }
 
+function keySet(setTo) {
+	if (e.keyCode === KEY_LEFT_ARROW) keyHeld_TurnLeft = setTo
+	if (e.keyCode === KEY_RIGHT_ARROW) keyHeld_TurnRight = setTo
+	if (e.keyCode === KEY_UP_ARROW) keyHeld_Gas = setTo
+	if (e.keyCode === KEY_DOWN_ARROW) keyHeld_Reverse = setTo
+}
+
 function keyPressed(e) {
-	if (e.keyCode === KEY_LEFT_ARROW) keyHeld_TurnLeft = true
-	if (e.keyCode === KEY_RIGHT_ARROW) keyHeld_TurnRight = true
-	if (e.keyCode === KEY_UP_ARROW) keyHeld_Gas = true
-	if (e.keyCode === KEY_DOWN_ARROW) keyHeld_Reverse = true
+	keySet(true)
 	e.preventDefault()
 }
 
 function keyReleased(e) {
-	if (e.keyCode === KEY_LEFT_ARROW) keyHeld_TurnLeft = false
-	if (e.keyCode === KEY_RIGHT_ARROW) keyHeld_TurnRight = false
-	if (e.keyCode === KEY_UP_ARROW) keyHeld_Gas = false
-	if (e.keyCode === KEY_DOWN_ARROW) keyHeld_Reverse = false
+	keySet(false)
 	e.preventDefault()
 }
