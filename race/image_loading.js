@@ -1,12 +1,11 @@
 var carPic = document.createElement('img')
-var wallPic = document.createElement('img')
-var roadPic = document.createElement('img')
+var trackPics = []
 
 var picsToLoad = 0
 
 function beginLoadingImage(imgVar, fileName) {
 	imgVar.onload = countLoadedImages
-	imgVar.src = fileName
+	imgVar.src = "images/" + fileName
 }
 
 function countLoadedImages() {
@@ -14,23 +13,45 @@ function countLoadedImages() {
 	if (picsToLoad === 0) startGame()
 }
 
+function loadImageForTrackCode(trackCode, fileName) {
+	trackPics[trackCode] = document.createElement('img')
+	beginLoadingImage(trackPics[trackCode], fileName)
+}
+
 function loadImages() {
 	var imageList = [
 		{
-			varName: wallPic,
+			varName: carPic,
+			theFile: 'player1car.png'
+		},
+		{
+			trackType: TRACK_WALL,
 			theFile: 'track_wall.png'
 		},
 		{
-			varName: roadPic,
+			trackType: TRACK_ROAD,
 			theFile: 'track_road.png'
 		},
 		{
-			varName: carPic,
-			theFile: 'player1car.png'
+			trackType: TRACK_FLAG,
+			theFile: 'track_flag.png'
+		},
+		{
+			trackType: TRACK_GOAL,
+			theFile: 'track_goal.png'
+		},
+		{
+			trackType: TRACK_TREE,
+			theFile: 'track_tree.png'
 		}
 	]
 
 	picsToLoad = imageList.length
-	for (let i = 0; i < imageList.length; i++)
-		beginLoadingImage(imageList[i].varName, imageList[i].theFile)
+	for (let i = 0; i < imageList.length; i++) {
+		if (imageList[i].varName !== undefined)
+			beginLoadingImage(imageList[i].varName, imageList[i].theFile)
+		else {
+			loadImageForTrackCode(imageList[i].trackType, imageList[i].theFile)
+		}
+	}
 }
