@@ -1,7 +1,3 @@
-const KEY_LEFT_ARROW = 37
-const KEY_RIGHT_ARROW = 39
-const KEY_UP_ARROW = 38
-const KEY_DOWN_ARROW = 40
 const GROUNDSPEED_DECAY_MULT = 0.94
 const DRIVE_POWER = 0.3
 const REVERSE_POWER = 0.2
@@ -9,29 +5,32 @@ const TURN_RATE = 0.08
 const MIN_SPEED_TO_TURN = 0.5
 
 function carClass() {
-	this.x = 75
-	this.y = 75
 	this.ang = 0
-	this.speed = 0
-	this.myCarPic = ''
+	this.controlKeyDown = 0
+	this.controlKeyLeft = 0
+	this.controlKeyRight = 0
+	this.controlKeyUp = 0
 	this.keyHeld_Gas = false
 	this.keyHeld_Reverse = false
 	this.keyHeld_TurnLeft = false
 	this.keyHeld_TurnRight = false
-	this.controlKeyUp = 0
-	this.controlKeyDown = 0
-	this.controlKeyLeft = 0
-	this.controlKeyRight = 0
+	this.myCarPic = ''
+	this.name = "Untitled Car"
+	this.speed = 0
+	this.x = 75
+	this.y = 75
 
-	this.setupInput = function (upKey, rightKey, downKey, leftKey) {
+	this.setupInput = function (upKey, downKey, leftKey, rightKey) {
 		this.controlKeyUp = upKey
 		this.controlKeyDown = downKey
 		this.controlKeyLeft = leftKey
 		this.controlKeyRight = rightKey
 	}
 
-	this.reset = function (whichImage) {
+	this.reset = function (whichImage, carName) {
+		this.name = carName
 		this.myCarPic = whichImage
+		this.speed = 0
 		for (let eachRow = 0; eachRow < TRACK_ROWS; eachRow++)
 			for (let eachCol = 0; eachCol < TRACK_COLS; eachCol++) {
 				let arrayIndex = rowColToArrayIndex(eachCol, eachRow)
